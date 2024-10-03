@@ -4,6 +4,7 @@ import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
 import exitHook from 'async-exit-hook'
 import { env } from '~/config/environment'
 import { APIs_V1 } from '~/routes/v1'
+import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 
 const START_SERVER = () => {
 
@@ -14,6 +15,9 @@ const START_SERVER = () => {
     console.log(env.AUTHOR)
     res.end('<h1>Hello World!</h1><hr>')
   })
+
+  //Middleware error handling
+  app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     console.log(`3. Hello Chinh, I am running at http://${ env.APP_HOST }:${ env.APP_PORT }/`)
