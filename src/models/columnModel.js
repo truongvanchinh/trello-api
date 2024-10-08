@@ -2,6 +2,8 @@ import Joi from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
+import { cardModel } from './cardModel'
+
 const COLUMN_COLLECTION_NAME = 'columns'
 const COLUMN_COLLECTION_SCHEMA = Joi.object({
   boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -50,11 +52,35 @@ const pushToCardOrderIds = async (card) => {
   } catch (error) { throw new Error(error) }
 }
 
+const getDetails = async (columnId) => {
+  try {
+    // const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(columnId) })
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).aggregate([
+      {
+        $match: {
+          _id: new ObjectId(columnId),
+          _destroy: false
+        }
+      },
+      {
+        $lookup: {
+          from: cardModel.CARD_COLLECTION_NAME,
+          // ~ liên kết bảng
+          localField: '_id',
+          foreignField: 'columnId',
+          as: 'cards'
+        }
+      }
+    ]).toArray()
+    return result[0] || null
+  } catch (error) { throw new Error(error) }
+}
 
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  pushToCardOrderIds
+  pushToCardOrderIds,
+  getDetails
 }

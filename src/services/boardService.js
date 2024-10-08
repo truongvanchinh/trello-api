@@ -13,10 +13,10 @@ const createNew = async (reqBody) => {
     }
 
     const createBoard = await boardModel.createNew(newBoard)
-    const getNewBoard = await boardModel.findOneById(createBoard.insertedId)
-    if (getNewBoard) {
-      getNewBoard.columns = []
-    }
+    // const getNewBoard = await boardModel.findOneById(createBoard.insertedId)
+    // if (getNewBoard) {
+    //   getNewBoard.columns = []
+    // }
     //Trong Service luôn phải có return
     return createBoard
   } catch (error) {
