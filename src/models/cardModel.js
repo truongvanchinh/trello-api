@@ -42,9 +42,25 @@ const findOneById = async (id) => {
   } catch (error) { throw new Error(error) }
 }
 
+const getDetails = async (cardId) => {
+  try {
+    // const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOne({ _id: new ObjectId(cardId) })
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).aggregate([
+      {
+        $match: {
+          _id: new ObjectId(cardId),
+          _destroy: false
+        }
+      }
+    ]).toArray()
+    return result[0] || null
+  } catch (error) { throw new Error(error) }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
-  findOneById
+  findOneById,
+  getDetails
 }

@@ -1,5 +1,7 @@
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
+import { StatusCodes } from 'http-status-codes'
+import { ApiError } from '~/utils/ApiError'
 
 const createNew = async (reqBody) => {
   try {
@@ -18,6 +20,19 @@ const createNew = async (reqBody) => {
   }
 }
 
+const getDetails = async (cardId) => {
+  try {
+    const card = await cardModel.getDetails(cardId)
+    if (!card) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Card not found!')
+    }
+    return card
+  } catch (error) {
+    throw error
+  }
+}
+
 export const cardService = {
-  createNew
+  createNew,
+  getDetails
 }

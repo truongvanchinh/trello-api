@@ -1,5 +1,8 @@
 import { columnModel } from '~/models/columnModel'
 import { boardModel } from '~/models/boardModel'
+import { StatusCodes } from 'http-status-codes'
+import { ApiError } from '~/utils/ApiError'
+import { cloneDeep } from 'lodash'
 
 const createNew = async (reqBody) => {
   try {
@@ -18,6 +21,21 @@ const createNew = async (reqBody) => {
   }
 }
 
+const getDetails = async (columnId) => {
+  try {
+    const column = await columnModel.getDetails(columnId)
+    if (!column) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Card not found!')
+    }
+
+    return column
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const columnService = {
-  createNew
+  createNew,
+  getDetails
 }
