@@ -19,6 +19,9 @@ const validateColumn = async (data) => {
   return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { bortEarly: false })
 }
 
+//chỉ định ra những trường 0 cho phép update
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const createNew = async (data) => {
   try {
     const validData = await validateColumn(data)
@@ -76,11 +79,30 @@ const getDetails = async (columnId) => {
   } catch (error) { throw new Error(error) }
 }
 
+const update = async (columnId, updatedData) => {
+  try {
+    // lọc ra field 0 cho phép cập nhật linh tinh
+    Object.keys(updatedData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updatedData[fieldName]
+      }
+    }
+    )
+    const result = GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(columnId)) },
+      { $set: updatedData },
+      { returnDocument: 'after' }
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   pushToCardOrderIds,
-  getDetails
+  getDetails,
+  update
 }
