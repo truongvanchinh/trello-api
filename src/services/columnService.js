@@ -34,8 +34,22 @@ const getDetails = async (columnId) => {
   }
 }
 
+const update = async (columnId, reqBody) => {
+  try {
+    const updatedData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+    const updatedColumn = await columnModel.update(columnId, updatedData)
+
+    return updatedColumn
+  } catch (error) {
+    throw error
+  }
+}
 
 export const columnService = {
   createNew,
-  getDetails
+  getDetails,
+  update
 }
