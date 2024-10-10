@@ -2,7 +2,6 @@ import { columnModel } from '~/models/columnModel'
 import { boardModel } from '~/models/boardModel'
 import { StatusCodes } from 'http-status-codes'
 import { ApiError } from '~/utils/ApiError'
-import { cloneDeep } from 'lodash'
 
 const createNew = async (reqBody) => {
   try {

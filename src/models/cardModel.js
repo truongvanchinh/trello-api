@@ -20,6 +20,9 @@ const validateCard = async (data) => {
   return await CARD_COLLECTION_SCHEMA.validateAsync(data, { bortEarly: false })
 }
 
+//chỉ định ra những trường 0 cho phép update
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const createNew = async (data) => {
   try {
     const validData = await validateCard(data)
@@ -57,10 +60,31 @@ const getDetails = async (cardId) => {
   } catch (error) { throw new Error(error) }
 }
 
+const update = async (cardId, updatedData) => {
+  try {
+    // lọc ra field 0 cho phép cập nhật linh tinh
+    Object.keys(updatedData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updatedData[fieldName]
+      }
+    })
+
+    if (updatedData.columnId) updatedData.columnId = new ObjectId(updatedData.columnId)
+
+    const result = GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(cardId)) },
+      { $set: updatedData },
+      { returnDocument: 'after' }
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getDetails
+  getDetails,
+  update
 }

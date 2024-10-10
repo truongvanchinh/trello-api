@@ -86,8 +86,12 @@ const update = async (columnId, updatedData) => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
         delete updatedData[fieldName]
       }
+    })
+
+    if (updatedData.cardOrderIds) {
+      updatedData.cardOrderIds = updatedData.cardOrderIds.map(cardId => (new ObjectId(cardId)))
     }
-    )
+
     const result = GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(String(columnId)) },
       { $set: updatedData },
