@@ -71,11 +71,19 @@ const update = async (cardId, updatedData) => {
 
     if (updatedData.columnId) updatedData.columnId = new ObjectId(updatedData.columnId)
 
-    const result = GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(String(cardId)) },
       { $set: updatedData },
       { returnDocument: 'after' }
     )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
+const deleteManyByColumnId = async (columnId) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({ columnId: new ObjectId(columnId) })
+    // console.log('🚀 ~ file: cardModel.js:86 ~ deleteManyByColumnId ~ result:', result)
     return result
   } catch (error) { throw new Error(error) }
 }
@@ -86,5 +94,6 @@ export const cardModel = {
   createNew,
   findOneById,
   getDetails,
-  update
+  update,
+  deleteManyByColumnId
 }

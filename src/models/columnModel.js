@@ -46,7 +46,7 @@ const findOneById = async (id) => {
 
 const pushToCardOrderIds = async (card) => {
   try {
-    const result = GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(card.columnId) },
       { $push: { cardOrderIds: new ObjectId(card._id) } },
       { returnDocument: 'after' }
@@ -92,11 +92,21 @@ const update = async (columnId, updatedData) => {
       updatedData.cardOrderIds = updatedData.cardOrderIds.map(cardId => (new ObjectId(cardId)))
     }
 
-    const result = GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(String(columnId)) },
       { $set: updatedData },
       { returnDocument: 'after' }
     )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
+const deleteOneById = async (columnId) => {
+  try {
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({
+      _id: new ObjectId(columnId)
+    })
+    // console.log('🚀 ~ file: columnModel.js:107 ~ result ~ result:', result)
     return result
   } catch (error) { throw new Error(error) }
 }
@@ -108,5 +118,6 @@ export const columnModel = {
   findOneById,
   pushToCardOrderIds,
   getDetails,
-  update
+  update,
+  deleteOneById
 }
