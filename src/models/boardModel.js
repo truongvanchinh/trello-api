@@ -80,11 +80,24 @@ const getDetails = async (boardId) => {
   } catch (error) { throw new Error(error) }
 }
 
+//thêm 1 phần tử vào columnOrderIds
 const pushToColumnOrderIds = async (column) => {
   try {
     const result = GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(column.boardId) },
       { $push: { columnOrderIds: new ObjectId(column._id) } },
+      { returnDocument: 'after' }
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
+//lấy 1 phần tử ra khỏi columnOrderIds
+const pullToColumnOrderIds = async (column) => {
+  try {
+    const result = GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $pull: { columnOrderIds: new ObjectId(column._id) } },
       { returnDocument: 'after' }
     )
     return result
@@ -120,5 +133,6 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushToColumnOrderIds,
+  pullToColumnOrderIds,
   update
 }
