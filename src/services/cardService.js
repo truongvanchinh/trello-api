@@ -14,7 +14,7 @@ const createNew = async (reqBody) => {
       getNewCard.cards = []
       await columnModel.pushToCardOrderIds(getNewCard)
     }
-    return createCard
+    return getNewCard
   } catch (error) {
     throw error
   }
