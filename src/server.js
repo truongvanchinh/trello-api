@@ -21,9 +21,17 @@ const START_SERVER = () => {
   //Middleware error handling
   app.use(errorHandlingMiddleware)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(`3. Hello Chinh, I am running at http://${ env.APP_HOST }:${ env.APP_PORT }/`)
-  })
+  if (env.BUILD_MODE === 'production') {
+    // moi truong production
+    app.listen(process.env.PORT, () => {
+      console.log(`3. Production: Hello Chinh, I am running at ${process.env.PORT}`)
+    })
+  } else {
+    //moi truong dev
+    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+      console.log(`3. Hello Chinh, I am running at http://${ env.LOCAL_DEV_APP_HOST }:${ env.LOCAL_DEV_APP_PORT }/`)
+    })
+  }
 
   exitHook(() => {
     console.log('exiting: ')
