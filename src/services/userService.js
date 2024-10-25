@@ -4,6 +4,8 @@ import ApiError from '~/utils/ApiError'
 import bcryptjs from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { pickUser } from '~/utils/formater'
+import { WEBSITE_DOMAIN } from '~/utils/constants'
+import { BrevoProvider } from '~/providers/BrevoProvider'
 
 const createNew = async (reqBody) => {
   try {
@@ -29,6 +31,16 @@ const createNew = async (reqBody) => {
     //*-------------------------------------------------------------------
 
     //? Gửi email cho người dùng xác thực tài khoản (buổi sau...)
+    const verificationLink = `${WEBSITE_DOMAIN}/account/verification?email=${getNewUser.email}&token=${getNewUser.verifyToken}`
+    const customSubject = 'Trello MERN Stack Advanced: Please verify your email before using our services!'
+    const htmlContent = `
+      <h3>Here is your verification link:</h3>
+      <h3>${verificationLink}</h3>
+      <h3>Sincerely, <br/> Truongchinhdev </h3>
+    `
+    // Gọi tới Provider gửi mail
+    await BrevoProvider.sendEmail(getNewUser.email, customSubject, htmlContent)
+
     //*-------------------------------------------------------------------
 
     //? return trả về dữ liệu cho phía Controller
