@@ -1,3 +1,4 @@
+import { pick } from 'lodash'
 export const slugify = (val) => {
   if (!val) return ''
   return String(val)
@@ -16,4 +17,10 @@ export function FormateData(data) {
   } else {
     throw new Error('Data Not found!')
   }
+}
+
+// Lấy một vài dữ liệu cụ thể trong User đề tránh việc trả về các dữ liệu nhạy cảm như hash password
+export const pickUser = (user) => {
+  if (!user) return {}
+  return pick(user, ['_id', 'email', 'username', 'displayName', 'avatar', 'role', 'isActive', 'createdAt', 'updatedAt'])
 }
