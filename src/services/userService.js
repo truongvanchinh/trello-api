@@ -102,6 +102,7 @@ const login = async (reqBody) => {
     const refreshToken = await JwtProvider.generateToken(
       userInfo,
       env.REFRESH_TOKEN_SECRET_SIGNATURE,
+      // 15
       env.REFRESH_TOKEN_LIFE
     )
 
@@ -110,8 +111,32 @@ const login = async (reqBody) => {
   } catch (error) { throw error }
 }
 
+const refreshToken = async (clientRefreshToken) => {
+  try {
+    // token hợp lệ thì trả ra payload ~ data
+    const refreshTokenDecoded = await JwtProvider.verifyToken(clientRefreshToken, env.REFRESH_TOKEN_SECRET_SIGNATURE)
+
+    //** Nếu mọi thứ ok thì bắt đầu tạo Tokens đăng nhập để trả về cho phía FE
+    //* Tạo thông tin sẽ đính kèm trong JWT Token bao gồm _id và email của user
+    const userInfo = { _id: refreshTokenDecoded._id, email: refreshTokenDecoded.email }
+
+    //* Tạo ra accessToken đề trà về cho phía FE
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      env.ACCESS_TOKEN_SECRET_SIGNATURE,
+      // 5
+      env.ACCESS_TOKEN_LIFE
+    )
+
+    //* Trả về thông tin của user kèm theo 2 cái token vừa tạo ra
+    return { accessToken }
+  } catch (error) { throw error }
+}
+
+
 export const userService = {
   createNew,
   verifyAccount,
-  login
+  login,
+  refreshToken
 }
