@@ -7,16 +7,28 @@ import { APIs_V1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from '~/config/cors'
-const START_SERVER = () => {
+import cookieParser from 'cookie-parser'
 
+const START_SERVER = () => {
   const app = express()
-  app.use(cors(corsOptions))
-  app.use(express.json())
-  app.use('/v1', APIs_V1)
-  app.get('/', (req, res) => {
-    console.log(env.AUTHOR)
-    res.end('<h1>Hello World!</h1><hr>')
+
+  // fix cache from disk
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
   })
+
+  //Cấu hình Cookie Parser
+  app.use(cookieParser())
+
+  // Xử lý CORS
+  app.use(cors(corsOptions))
+
+  //Enable req.body json data
+  app.use(express.json())
+
+  // use APIs v1
+  app.use('/v1', APIs_V1)
 
   //Middleware error handling
   app.use(errorHandlingMiddleware)
