@@ -133,10 +133,37 @@ const refreshToken = async (clientRefreshToken) => {
   } catch (error) { throw error }
 }
 
+const update = async (userId, reqBody) => {
+  try {
+    // Query kt cho chắc chắn
+    const existUser = await userModel.findOneById(userId)
+    if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Accout Not Found!!!')
+    if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Account is already active!!!')
+
+    //Khởi tạo kq update User là empty
+    let updatedUser = {}
+
+    // TH1: Change password
+    if (reqBody.current_password && reqBody.new_password) {
+      //Check password
+      if (!bcryptjs.compareSync(reqBody.current_password, existUser.password)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your current password is incorrect!!!')
+      }
+      updatedUser = await userModel.update(userId, {
+        password: bcryptjs.hashSync(reqBody.new_password, 8)
+      })
+    } else {
+      // TH2: Change common info: display name,...
+      updatedUser = await userModel.update(userId, reqBody)
+    }
+    return pickUser(updatedUser)
+  } catch (error) { throw error }
+}
 
 export const userService = {
   createNew,
   verifyAccount,
   login,
-  refreshToken
+  refreshToken,
+  update
 }
