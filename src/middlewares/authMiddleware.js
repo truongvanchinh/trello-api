@@ -16,7 +16,6 @@ const isAuthorized = async (req, res, next) => {
   try {
     // Bước 01: Thực hiện giải mã token xem nó có hợp lệ hay là không
     const accessTokenDecoded = await JwtProvider.verifyToken(clientAccessToken, env.ACCESS_TOKEN_SECRET_SIGNATURE)
-    console.log('🚀 ~ file: authMiddleware.js:19 ~ isAuthorized ~ accessTokenDecoded:', accessTokenDecoded)
 
     // Bước 02: Quan trọng: Nều như cái token hợp lệ, thì sẽ cần phải lưu thông tin giải mã được vào cái req. jwtDecoded, dễ sử dụng cho các tầng cần xử lý ở phía sau
     req.jwtDecoded = accessTokenDecoded
@@ -24,7 +23,6 @@ const isAuthorized = async (req, res, next) => {
     // Bước 3: Cho phép cái request đi tiếp
     next()
   } catch (error) {
-    console.log('🚀 ~ file: authMiddleware.js:27 ~ isAuthorized ~ error:', error)
     // Nếu cái accessTollen nó bị hết han (expired) thì mình cần trà về một cái mã lỗi GONE - 410 cho phía FE biết để gọi api refreshToken
     if (error?.message?.includes('jwt expired')) {
       next(new ApiError (StatusCodes.GONE, 'Need to refresh token.'))
