@@ -37,10 +37,16 @@ const validateBoard = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { bortEarly: false })
 }
 
-const createNew = async (data) => {
+const createNew = async (userId, data) => {
   try {
     const validData = await validateBoard(data)
-    const createBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+
+    const newBoardToAdd = {
+      ...validData,
+      ownerIds: [new ObjectId(String(userId))]
+    }
+
+    const createBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoardToAdd)
     return createBoard
   } catch (error) { throw new Error(error) }
 }
@@ -54,15 +60,21 @@ const findOneById = async (id) => {
   } catch (error) { throw new Error(error) }
 }
 
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
     // const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(boardId) })
+    const queryConditions = [
+      { _id: new ObjectId(boardId) },
+      { _destroy: false },
+      { $or: [
+        { ownerIds: { $all: [new ObjectId(String(userId))] } },
+        { memberIds: { $all: [new ObjectId(String(userId))] } }
+      ] }
+    ]
+
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
       {
-        $match: {
-          _id: new ObjectId(boardId),
-          _destroy: false
-        }
+        $match: { $and: queryConditions }
       },
       {
         $lookup: {
@@ -162,7 +174,6 @@ const getBoards = async (userId, page, itemPerPage) => {
     ).toArray()
 
     const res = query[0]
-
     return {
       boards: res.queryBoards || [],
       totalBoards: res.queryTotalBoards[0]?.countedAllBoards || 0

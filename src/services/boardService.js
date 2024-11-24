@@ -8,29 +8,29 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
-const createNew = async (reqBody) => {
+const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
       ...reqBody,
       slug: slugify(reqBody.title)
     }
 
-    const createBoard = await boardModel.createNew(newBoard)
-    // const getNewBoard = await boardModel.findOneById(createBoard.insertedId)
+    const createBoard = await boardModel.createNew(userId, newBoard)
+    const getNewBoard = await boardModel.findOneById(createBoard.insertedId)
     // if (getNewBoard) {
     //   getNewBoard.columns = []
     // }
     //Trong Service luôn phải có return
-    return createBoard
+    return getNewBoard
   } catch (error) {
     throw error
   }
 }
 
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
 
-    const board = await boardModel.getDetails(boardId)
+    const board = await boardModel.getDetails(userId, boardId)
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
     }
