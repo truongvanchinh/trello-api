@@ -6,6 +6,7 @@ import { BOARD_TYPES } from '~/utils/constants'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
 import { pagingSkipValue } from '~/utils/algorithms'
+import { userModel } from './userModel'
 
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
@@ -92,6 +93,28 @@ const getDetails = async (userId, boardId) => {
           localField: '_id',
           foreignField: 'boardId',
           as: 'cards'
+        }
+      },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          // ~ liên kết bảng
+          localField: 'ownerIds',
+          foreignField: '_id',
+          as: 'owners', // -> trả về màng tên là owners
+          // pipeline trong lookup là để xử lý 1 hoặc nhiều luồng cần thiết.
+          // $project để chỉ định vào field 0 muốn lấy về bằng cách gán nó giá trị 0
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+        }
+      },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          // ~ liên kết bảng
+          localField: 'memberIds',
+          foreignField: '_id',
+          as: 'members',
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
         }
       }
     ]).toArray()
