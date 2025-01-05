@@ -9,6 +9,11 @@ import cors from 'cors'
 import { corsOptions } from '~/config/cors'
 import cookieParser from 'cookie-parser'
 
+// Xử lý socket.io real time
+import http from 'http'
+import socketIo from 'socket.io'
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket'
+
 const START_SERVER = () => {
   const app = express()
 
@@ -33,14 +38,24 @@ const START_SERVER = () => {
   //Middleware error handling
   app.use(errorHandlingMiddleware)
 
+  //Tạo 1 server mới bọc app của express để làm real-time với socket.io
+  const server = http.createServer(app)
+
+  //Khởi tạo biến io với server và cors
+  const io = socketIo(server, { cors: corsOptions })
+  // io.on('connection', (socket) => {
+  //   inviteUserToBoardSocket(socket)
+  // })
+  io.on('connection', inviteUserToBoardSocket)
+
   if (env.BUILD_MODE === 'production') {
     // moi truong production
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log(`3. Production: Hello Chinh, I am running at ${process.env.PORT}`)
     })
   } else {
     //moi truong dev
-    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+    server.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
       console.log(`3. Hello Chinh, I am running at http://${ env.LOCAL_DEV_APP_HOST }:${ env.LOCAL_DEV_APP_PORT }/`)
     })
   }
