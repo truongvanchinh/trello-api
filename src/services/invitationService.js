@@ -18,6 +18,12 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
     if (!inviter || !invitee || !board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Inviter, Invitee or Board not found!')
     }
+
+    // KT xem có đang mời chính nó hay không
+    //...
+    // Kt nó có trong board hay chưa
+    //...
+
     // Tạo data cần thiết để lưu vào trong DB
     // Có thể thử bỏ hoặc làm sai lệch type, boardInvitation, status đề test xem Model validate ok chưa.
     const newInvitationData = {
@@ -46,6 +52,22 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
   }
 }
 
+const getInvitations = async (userId) => {
+  try {
+    const getInvitations = await invitationModel.findByUser(userId)
+    console.log('getInvitations: ', getInvitations)
+    // Vì các dữ liệu inviter, invitee và board là đang ở giá trị màng 1 phần từ nều lấy ra được nên chúng ta biễn đồi nó về Json Object trước khi trả về
+    const resInvitations = getInvitations.map(i => ({
+      ...i,
+      inviter: i.inviter[0] || {},
+      invitee: i.invitee[0] || {},
+      board: i.board[0] || {}
+    }))
+    return resInvitations
+  } catch (error) { throw error }
+}
+
 export const invitationService = {
-  createNewBoardInvitation
+  createNewBoardInvitation,
+  getInvitations
 }
