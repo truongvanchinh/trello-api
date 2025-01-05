@@ -5,6 +5,9 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
 
+Router.route('/')
+  .get(authMiddleware.isAuthorized, invitationController.getInvitations)
+
 Router.route('/board')
   .post(
     authMiddleware.isAuthorized,
