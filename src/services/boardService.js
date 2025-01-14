@@ -86,13 +86,18 @@ const moveCardToDifferentColumn = async (reqBody) => {
   }
 }
 
-const getBoards = async (userId, page, itemPerPage) => {
+const getBoards = async (userId, page, itemPerPage, queryFilter) => {
   try {
     // Nếu không tồn tại page hoặc itemsPerPage từ phía FE thì BE sẽ cần phải luôn gán giá trị mặc định
     if (!page) page = DEFAULT_PAGE
     if (!itemPerPage) itemPerPage = DEFAULT_ITEMS_PER_PAGE
 
-    const result = await boardModel.getBoards(userId, parseInt(page, 10), parseInt(itemPerPage, 10))
+    const result = await boardModel.getBoards(
+      userId,
+      parseInt(page, 10),
+      parseInt(itemPerPage, 10),
+      queryFilter
+    )
 
     return result
   } catch (error) {
