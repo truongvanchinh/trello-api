@@ -8,11 +8,11 @@ services:
     volumes:
       - .:/src/app
     environment:
-      - LOCAL_DEV_APP_PORT=${LOCAL_DEV_APP_PORT}
+      - LOCAL_DEV_APP_PORT=8017
       - NODE_ENV=development
       - MONGO_URI=${MONGODB_URI}
     ports:
-      - "${LOCAL_DEV_APP_PORT}:${LOCAL_DEV_APP_PORT}"
+      - "8017:8017"
     networks:
       - app-network
 networks:
