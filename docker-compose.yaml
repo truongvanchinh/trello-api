@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  trello-api: 
+    build: .
+    container_name: trello-api
+    working_dir: /backend/app
+    restart: always
+    volumes:
+      - .:/src/app
+    environment:
+      - LOCAL_DEV_APP_PORT=${LOCAL_DEV_APP_PORT}
+      - NODE_ENV=development
+      - MONGO_URI=${MONGODB_URI}
+    ports:
+      - "${LOCAL_DEV_APP_PORT}:${LOCAL_DEV_APP_PORT}"
+    networks:
+      - app-network
+networks:
+  app-network:
+    external: true
