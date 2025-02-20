@@ -46,7 +46,7 @@ const START_SERVER = () => {
   // io.on('connection', (socket) => {
   //   inviteUserToBoardSocket(socket)
   // })
-  io.on('connection', inviteUserToBoardSocket)
+  io.on('connection', (socket) => inviteUserToBoardSocket(socket, io))
 
   if (env.BUILD_MODE === 'production') {
     // moi truong production
