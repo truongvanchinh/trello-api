@@ -13,6 +13,7 @@ import cookieParser from 'cookie-parser'
 import http from 'http'
 import socketIo from 'socket.io'
 import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket'
+import { updateBoardSocket } from './sockets/updateBoardSocket'
 
 const START_SERVER = () => {
   const app = express()
@@ -47,6 +48,7 @@ const START_SERVER = () => {
   //   inviteUserToBoardSocket(socket)
   // })
   io.on('connection', (socket) => inviteUserToBoardSocket(socket, io))
+  io.on('connection', updateBoardSocket)
 
   if (env.BUILD_MODE === 'production') {
     // moi truong production
