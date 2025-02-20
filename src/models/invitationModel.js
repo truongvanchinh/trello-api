@@ -7,7 +7,7 @@ import { userModel } from './userModel'
 import { boardModel } from './boardModel'
 
 
-const INVITATION_COLLECTION_NAME = 'cards'
+const INVITATION_COLLECTION_NAME = 'invites'
 const INVITATION_COLLECTION_SCHEMA = Joi.object({
   inviterId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   inviteeId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
