@@ -8,6 +8,7 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
+import { invitationModel } from '~/models/invitationModel'
 const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
@@ -105,10 +106,27 @@ const getBoards = async (userId, page, itemPerPage, queryFilter) => {
   }
 }
 
+const deleteItem = async (boardId) => {
+  const targetColumn = await boardModel.findOneById(boardId)
+  if (!targetColumn) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
+  }
+  // Xóa tất cả dữ liệu liên quan đến board
+  await Promise.all([
+    cardModel.deleteManyByBoardId(boardId),
+    columnModel.deleteManyByBoardId(boardId),
+    invitationModel.deleteManyByBoardId(boardId),
+    boardModel.deleteOneById(boardId)
+  ])
+
+  return { deleteResult: 'Board, Columns and Cards deleted successfully!' }
+}
+
 export const boardService = {
   createNew,
   getDetails,
   update,
   moveCardToDifferentColumn,
-  getBoards
+  getBoards,
+  deleteItem
 }
